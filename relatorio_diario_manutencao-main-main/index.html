@@ -268,6 +268,8 @@
         .notification.show {
             opacity: 1;
         }
+
+        @page { size: A4; margin: 15mm; }
         
         @media (max-width: 768px) {
             .main-content {
@@ -403,10 +405,7 @@
                         <textarea id="description" required placeholder="Descreva detalhadamente a atividade realizada..."></textarea>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="observations">Observações</label>
-                        <textarea id="observations" placeholder="Observações relevantes, recomendações, próximos passos..."></textarea>
-                    </div>
+                    <!-- Observações removidas conforme solicitação -->
                     
                     <div class="form-group">
                         <label for="pendencia">Pendência</label>
@@ -575,9 +574,6 @@
                             <textarea id="edit-description-${index}" placeholder="Descrição">${activity.description || ''}</textarea>
                         </div>
                         <div class="form-group">
-                            <textarea id="edit-observations-${index}" placeholder="Observações">${activity.observations || ''}</textarea>
-                        </div>
-                        <div class="form-group">
                             <textarea id="edit-pendencia-${index}" placeholder="Pendência">${activity.pendencia || ''}</textarea>
                         </div>
                         <div class="activity-actions">
@@ -594,7 +590,6 @@
                         <div class="activity-equipment">${activity.equipment}</div>
                         <div class="activity-technician">Técnico: ${activity.technician}</div>
                         <div class="activity-description">${activity.description}</div>
-                        ${activity.observations ? `<div class="activity-observations"><strong>Observações:</strong> ${activity.observations}</div>` : ''}
                         ${activity.pendencia ? `<div class="activity-pendencia"><strong>Pendência:</strong> ${activity.pendencia}</div>` : ''}
                         <div class="activity-actions">
                             <button class="btn btn-primary" onclick="editActivity(${index})">
@@ -625,7 +620,6 @@
             const equipment = document.getElementById('equipment').value;
             const type = document.getElementById('activity-type').value;
             const description = document.getElementById('description').value;
-            const observations = document.getElementById('observations').value;
             const pendencia = document.getElementById('pendencia').value;
             
             // Validação mínima de horários
@@ -642,7 +636,6 @@
                 equipment,
                 type,
                 description,
-                observations,
                 pendencia
             };
             
@@ -676,7 +669,6 @@
             const equipment = document.getElementById(`edit-equipment-${index}`).value;
             const type = document.getElementById(`edit-type-${index}`).value;
             const description = document.getElementById(`edit-description-${index}`).value;
-            const observations = document.getElementById(`edit-observations-${index}`).value;
             const pendencia = document.getElementById(`edit-pendencia-${index}`).value;
             
             // Validação mínima
@@ -693,7 +685,6 @@
                 equipment,
                 type,
                 description,
-                observations,
                 pendencia
             };
             
@@ -764,9 +755,9 @@
                 return;
             }
             
-            // Inicializar jsPDF
+            // Inicializar jsPDF (formato A4)
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+            const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
             
             // Configurações do documento
             const pageWidth = doc.internal.pageSize.getWidth();
@@ -901,7 +892,6 @@
                     activity.equipment,
                     typeNames[activity.type] || activity.type,
                     descText,
-                    activity.observations || '-',
                     pendText
                 ];
             });
@@ -909,7 +899,7 @@
             // Adicionar tabela com estilos responsivos
             doc.autoTable({
                 startY: yPosition + 15,
-                head: [['Horário', 'Técnico', 'Equipamento', 'Tipo', 'Descrição', 'Observações', 'Pendência']],
+                head: [['Horário', 'Técnico', 'Equipamento', 'Tipo', 'Descrição', 'Pendência']],
                 body: tableData,
                 margin: { left: margin, right: margin },
                 styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
@@ -922,8 +912,7 @@
                     2: { cellWidth: colEquip },
                     3: { cellWidth: colTipo },
                     4: { cellWidth: descColWidth },
-                    5: { cellWidth: 30 },
-                    6: { cellWidth: pendColWidth }
+                    5: { cellWidth: pendColWidth }
                 }
             });
             
